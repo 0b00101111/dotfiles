@@ -25,8 +25,37 @@ print_error() {
 # Check if command exists
 check_command() {
     if ! command -v $1 &> /dev/null; then
-        print_error "$1 is not installed. Please install it first."
+        if [ "$1" = "zsh" ]; then
+            print_step "zsh not found. At}
+
+# Install zsh based on the operating system
+install_zsh() {
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS
+        if command -v brew &> /dev/null; then
+            brew install zsh
+        else
+            print_error "Homebrew is required to install zsh on macOS"
+        fi
+    elif command -v apt &> /dev/null; then
+        # Debian/Ubuntu
+        sudo apt update
+        sudo apt install -y zsh
+    elif command -v dnf &> /dev/null; then
+        # Fedora
+        sudo dnf install -y zsh
+    elif command -v pacman &> /dev/null; then
+        # Arch Linux
+        sudo pacman -S --noconfirm zsh
+    else
+        print_error "Unable to detect package manager to install zsh"
     fi
+
+    # Verify installation
+    if ! command -v zsh &> /dev/null; then
+        print_error "Failed to install zsh"
+    fi
+    print_success "zsh installed successfully"
 }
 
 # Check required commands
