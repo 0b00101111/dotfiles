@@ -146,3 +146,5 @@ alias pls='pwd && echo "\nCurrent directory:" && ls -lh && echo "\nParent direct
 alias c4="cd '/Users/shuang/Library/Mobile Documents/com~apple~CloudDocs/studyInCanada/CS5004/'"
 
 alias c8="cd '/Users/shuang/Library/Mobile Documents/com~apple~CloudDocs/studyInCanada/CS5008/'"
+
+alias vi="vim"
