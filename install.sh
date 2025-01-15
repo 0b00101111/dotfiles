@@ -97,3 +97,4 @@ ln -sf "$PWD/p10k.zsh" ~/.p10k.zsh
 print_success "Installation completed successfully!"
 print_step "Please restart your terminal or run 'source ~/.zshrc' to apply changes"
 
+
