@@ -1,101 +1,131 @@
-
 #!/bin/bash
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+# Define colors for output
+GREEN="\033[1;32m"
+RED="\033[1;31m"
+BLUE="\033[1;34m"
+NC="\033[0m" # No color
 
-# Print step message
+# Print functions
 print_step() {
     echo -e "${BLUE}==> $1${NC}"
 }
 
-# Print success message
 print_success() {
-    echo -e "${GREEN}==> $1${NC}"
+    echo -e "${GREEN}[✔] $1${NC}"
 }
 
-# Print error message
 print_error() {
-    echo -e "${RED}==> Error: $1${NC}"
+    echo -e "${RED}[✘] $1${NC}"
     exit 1
 }
 
-# Check if command exists
-check_command() {
-    if ! command -v $1 &> /dev/null; then
-        if [ "$1" = "zsh" ]; then
-            print_step "zsh not found. At}
-
-# Install zsh based on the operating system
+# Install Zsh
 install_zsh() {
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        # macOS
-        if command -v brew &> /dev/null; then
-            brew install zsh
+    if command -v zsh &> /dev/null; then
+        print_success "Zsh is already installed"
+        if [[ "$SHELL" != "$(which zsh)" ]]; then
+            print_step "Setting Zsh as the default shell..."
+            chsh -s "$(which zsh)"
+            print_success "Zsh is now the default shell. Please log out and back in for changes to take effect."
         else
-            print_error "Homebrew is required to install zsh on macOS"
+            print_success "Zsh is already the default shell"
         fi
-    elif command -v apt &> /dev/null; then
-        # Debian/Ubuntu
-        sudo apt update
-        sudo apt install -y zsh
-    elif command -v dnf &> /dev/null; then
-        # Fedora
-        sudo dnf install -y zsh
-    elif command -v pacman &> /dev/null; then
-        # Arch Linux
-        sudo pacman -S --noconfirm zsh
     else
-        print_error "Unable to detect package manager to install zsh"
+        print_step "Installing Zsh..."
+        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            if command -v apt &> /dev/null; then
+                sudo apt update
+                sudo apt install -y zsh
+            elif command -v yum &> /dev/null; then
+                sudo yum install -y zsh
+            else
+                print_error "Unsupported Linux distribution. Please install Zsh manually."
+            fi
+        elif [[ "$OSTYPE" == "darwin"* ]]; then
+            if command -v brew &> /dev/null; then
+                brew install zsh
+            else
+                print_error "Homebrew is required to install Zsh on macOS. Please install it and rerun this script."
+            fi
+        else
+            print_error "Unsupported OS. Please install Zsh manually."
+        fi
+        chsh -s "$(which zsh)"
+        print_success "Zsh installed and set as the default shell. Please log out and back in for changes to take effect."
     fi
-
-    # Verify installation
-    if ! command -v zsh &> /dev/null; then
-        print_error "Failed to install zsh"
-    fi
-    print_success "zsh installed successfully"
 }
 
-# Check required commands
-print_step "Checking required dependencies..."
-check_command "zsh"
-check_command "git"
-check_command "curl"
-print_success "All dependencies are installed!"
+# Install Vim
+install_vim() {
+    if command -v vim &> /dev/null; then
+        print_success "Vim is already installed"
+    else
+        print_step "Installing Vim..."
+        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            if command -v apt &> /dev/null; then
+                sudo apt update
+                sudo apt install -y vim
+            elif command -v yum &> /dev/null; then
+                sudo yum install -y vim
+            else
+                print_error "Unsupported Linux distribution. Please install Vim manually."
+            fi
+        elif [[ "$OSTYPE" == "darwin"* ]]; then
+            if command -v brew &> /dev/null; then
+                brew install vim
+            else
+                print_error "Homebrew is required to install Vim on macOS. Please install it and rerun this script."
+            fi
+        else
+            print_error "Unsupported OS. Please install Vim manually."
+        fi
+    fi
+}
 
-# Backup existing files
-print_step "Backing up existing configuration files..."
-backup_timestamp=$(date +%Y%m%d_%H%M%S)
-[ -f ~/.zshrc ] && mv ~/.zshrc ~/.zshrc.backup.$backup_timestamp
-[ -f ~/.p10k.zsh ] && mv ~/.p10k.zsh ~/.p10k.zsh.backup.$backup_timestamp
+# Install Tmux
+install_tmux() {
+    if command -v tmux &> /dev/null; then
+        print_success "Tmux is already installed"
+    else
+        print_step "Installing Tmux..."
+        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            if command -v apt &> /dev/null; then
+                sudo apt update
+                sudo apt install -y tmux
+            elif command -v yum &> /dev/null; then
+                sudo yum install -y tmux
+            else
+                print_error "Unsupported Linux distribution. Please install Tmux manually."
+            fi
+        elif [[ "$OSTYPE" == "darwin"* ]]; then
+            if command -v brew &> /dev/null; then
+                brew install tmux
+            else
+                print_error "Homebrew is required to install Tmux on macOS. Please install it and rerun this script."
+            fi
+        else
+            print_error "Unsupported OS. Please install Tmux manually."
+        fi
+    fi
+}
 
-# Install oh-my-zsh if not already installed
-print_step "Checking oh-my-zsh installation..."
-if [ ! -d ~/.oh-my-zsh ]; then
-    print_step "Installing oh-my-zsh..."
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-else
-    print_success "oh-my-zsh is already installed"
-fi
+# Create symbolic links for configuration files
+create_symlinks() {
+    SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+    ln -sf "$SCRIPT_DIR/.zshrc" ~/.zshrc || print_error "Failed to create symlink for .zshrc"
+    ln -sf "$SCRIPT_DIR/.p10k.zsh" ~/.p10k.zsh || print_error "Failed to create symlink for .p10k.zsh"
+    ln -sf "$SCRIPT_DIR/vimrc" ~/.vimrc || print_error "Failed to create symlink for .vimrc"
+    print_success "Symbolic links created successfully"
+}
 
-# Install powerlevel10k theme
-print_step "Installing powerlevel10k theme..."
-if [ ! -d ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k ]; then
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
-else
-    print_success "powerlevel10k theme is already installed"
-fi
+# Main script
+print_step "Starting dotfiles setup..."
 
-# Create symbolic links
-print_step "Creating symbolic links..."
-ln -sf "$PWD/zshrc" ~/.zshrc
-ln -sf "$PWD/p10k.zsh" ~/.p10k.zsh
+install_zsh
+install_vim
+install_tmux
+create_symlinks
 
-print_success "Installation completed successfully!"
-print_step "Please restart your terminal or run 'source ~/.zshrc' to apply changes"
-
-
-
+print_step "Setup completed!"
+echo -e "${BLUE}Please restart your terminal or log out and back in to apply the changes.${NC}"
