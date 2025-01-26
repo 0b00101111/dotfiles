@@ -148,3 +148,19 @@ alias c4="cd '/Users/shuang/Library/Mobile Documents/com~apple~CloudDocs/studyIn
 alias c8="cd '/Users/shuang/Library/Mobile Documents/com~apple~CloudDocs/studyInCanada/CS5008/'"
 
 alias vi="vim"
+alias fst="git fetch && git status"
+alias lr='cd "/Users/shuang/Documents/GitHub/learnRust"'
+
+# History Configuration
+HISTSIZE=500000
+SAVEHIST=500000
+
+# History Options
+setopt EXTENDED_HISTORY # save timestamp and duration
+setopt INC_APPEND_HISTORY # append commands to HISTFILE immediately
+setopt HIST_EXPIRE_DUPS_FIRST # expire duplicate entries first
+setopt HIST_IGNORE_DUPS # don't record consecutive duplicates
+
+# History aliases
+alias ha='fc -l -t "%Y-%m-%d %H:%M:%S" 1 | sort'
+alias ht='TZ=America/Vancouver fc -l -t "%Y-%m-%d %H:%M:%S" 1 | grep "$(TZ=America/Vancouver date +%Y-%m-%d)" | sort'
