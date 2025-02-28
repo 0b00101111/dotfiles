@@ -61,9 +61,9 @@ Plug 'itchyny/lightline.vim'          " Status line enhancement
 Plug 'dense-analysis/ale'             " Async linting engine
 
 " Additional plugins for C development
-Plug 'ludovicchabant/vim-gutentags'   " Automatic tags management
+Plug 'ludovicchabant/vim-gutentags'   " Automatic tags management. Ctl+] to jump to function definition, Ctl+o go back.
 Plug 'jiangmiao/auto-pairs'           " Auto pair brackets
-Plug 'vim-scripts/a.vim'              " Quick switching between .c and .h files
+Plug 'vim-scripts/a.vim'              " Quick switching between .c and .h fileas using F4
 Plug 'wellle/context.vim'             " Show function context
 Plug 'liuchengxu/vim-which-key'       " Command cheatsheet
 call plug#end()
@@ -97,7 +97,7 @@ let g:ale_linters = {
 \}
 
 let g:ale_fixers = {
-\   'c': ['clang-format'],
+\   'c': [],
 \   '*': ['remove_trailing_lines', 'trim_whitespace']
 \}
 let g:ale_fix_on_save = 1               " Fix files automatically on save
@@ -114,6 +114,9 @@ let g:clang_format#style_options = {
             \ "AllowShortIfStatementsOnASingleLine": "false",
             \ "IndentCaseLabels": "false",
             \ "Standard": "C11"}
+
+" Manual clang-format for C files(format entire file)
+nnoremap <leader>cf :!clang-format -i %<CR>
 
 " Gutentags Configuration
 let g:gutentags_ctags_exclude = ['.git', 'node_modules', 'build']
